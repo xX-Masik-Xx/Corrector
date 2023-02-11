@@ -2,9 +2,9 @@
 from CorrectAdvices.CorrectAdvice import CorrectAdvice
 from CorrectionHandler import CorrectionHandler
 from WordFromText import WordFromText
-from Text import Text
 
-from fuzzywuzzy import fuzz
+import difflib
+from collections import defaultdict
 
 class SpellingCorrectionAdvice(CorrectAdvice):
     def __init__(self, handler: CorrectionHandler, beginning: int, ending: int, incorrect_word: WordFromText, corrected_word: str) -> None:
@@ -18,16 +18,27 @@ class SpellingCorrectionAdvice(CorrectAdvice):
 
     @staticmethod
     def check_for_presence(handler: CorrectionHandler)-> bool:
-        #Список слов
-        words_list = ["яблоко", "груша", "апельсин"]
-
+        words_list = SpellingCorrectionAdvice.get_words_list()
+        
         for word in handler.get_text.contained_words:
-            for true_word in words_list:
-                if fuzz.ratio(word.as_string().lower(), true_word) > 65 and word.as_string().lower() not in words_list:
-                    mistake = SpellingCorrectionAdvice(handler, word.beginning, word.ending, word, true_word)
-                    mistake.corrected_word = true_word
-                    return True, mistake
+            first_letter_dicts = words_list[word.as_string().lower()[0]] + words_list[word.as_string().upper()[0]]
+            if word.as_string().lower() not in first_letter_dicts:
+                true_word = difflib.get_close_matches(word.as_string().lower(), first_letter_dicts, n=1)[0]
+                mistake = SpellingCorrectionAdvice(handler, word.beginning, word.ending, word, true_word)
+                mistake.corrected_word = true_word
+                return True, mistake
         return False
+    
+    
+    @staticmethod
+    def get_words_list() -> list[str]:
+        file = open('russian.txt','r')
+
+        inpt = file.read().splitlines()
+        result = defaultdict(list)
+        for word in inpt:
+            result[word[0]].append(word)
+        return result
 
     def correct(self) -> None:
         super().correct()

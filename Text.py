@@ -9,17 +9,20 @@ class Text:
         self.corrected_text = None
 
     def __split_words(self) -> list[WordFromText]:
-        delimiters = {" ","!","\"","#","$","%","&","\'","(",")","*","+","-",".",",","/",":",";","<","=",">","?","@","[","]","^","_","`","{","|","}","~"}
+        delimiters = {" ", "!","\"","#","$","%","&","\'","(",")","*","+","-",".",",","/",":",";","<","=",">","?","@","[","]","^","_","`","{","|","}","~"}
         ignore = {"	"}
-        current_string = self._string_text
+        current_string = self._string_text + " "
         result_list = []
         if not current_string:
             return [WordFromText(self, 0, len(self.string_text))]
         start = 0
         for index, char in enumerate(current_string):
             if char in delimiters:
-                result_list.append(WordFromText(self, start, index))
-                start = index + 1
+                if not (set(current_string[start:index+1]).issubset(delimiters)):
+                    result_list.append(WordFromText(self, start, index))
+                    start = index + 1
+                else:
+                    start += 1
             elif char in ignore:
                 start += 1
         if start == 0:
