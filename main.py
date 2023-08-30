@@ -1,3 +1,4 @@
+#imports
 from Text import Text
 from CorrectionHandler import CorrectionHandler
 
@@ -6,5 +7,5 @@ if __name__ == "__main__":
     print("Введите текст:")
     input_text = Text(input())
     
-    #Экземпляр CorrectionHandler:
+    #Instance of CorrectionHandler:
     CorrectionHandler(input_text)

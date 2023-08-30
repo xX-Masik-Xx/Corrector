@@ -1,24 +1,26 @@
-from CorrectionHandler import CorrectionHandler
-
 class CorrectAdvice:
-    def __init__(self, handler: CorrectionHandler, message: str, mistake_type: str, beginning: int, ending: int) -> None:
+    def __init__(self, handler, message: str, mistake_type: str, beginning: int, ending: int, answer_input_type = None, message_input_modifiers = None) -> None:
         self.message = message
         self._mistake_type = mistake_type
         self._handler = handler
         self._beginning = beginning
         self._ending = ending
+        self.answer_input_type = answer_input_type
+        self.message_input_modifiers = message_input_modifiers
 
     def throw(self, **kwargs) -> str:
+        data = kwargs if self.message_input_modifiers == None else {key:self.message_input_modifiers[key](value) for (key,value) in kwargs.items()}
         if kwargs.keys:
-            return "\"{}\" — " + self.message.format(**kwargs) + "?"
+            return "\"{}\" — " + self.message.format(**data) + "?"
         else: 
             return f"\"{self._handler.get_text}\" — {self.message}?"
 
-    def correct(self) -> None:
+    def correct(self, answer = None) -> None:
         self._handler.mistakes_count -= 1
+        self._handler.edited = True
 
     @staticmethod
-    def check_for_presence(self, handler: CorrectionHandler):
+    def check_for_presence(self, handler):
         pass
 
     @property
