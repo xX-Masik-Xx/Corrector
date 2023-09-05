@@ -30,7 +30,7 @@ class CorrectionHandler:
         answer = input(mistake.throw().format(text_to_print) + "  ").lower()
         valid_input_type = mistake.answer_input_type
         if answer == "нет":
-            self.mistakes_count -= 1
+            mistake.correction_rejected()
         elif valid_input_type != None:
             try:
                 if valid_input_type == int:

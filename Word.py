@@ -1,4 +1,5 @@
 from Dictionary import Dictionary
+import difflib
 
 class Word:
     def __init__(self, text, beginning: int, ending: int) -> None:
@@ -22,7 +23,28 @@ class Word:
             return self.text.morph_analyzer.normal_forms(formatted_word)
         else:
             self._spelling_mistake = True
-            return Dictionary.closest_dictionary_words(formatted_word, self.text.dictionary)
+            #return Dictionary.closest_dictionary_words(formatted_word, self.text.dictionary)
+            return self.closest_dictionary_words(formatted_word, self.text.dictionary.iterkeys(formatted_word[0]))
+        
+    def closest_dictionary_words(self, word: str, words_list) -> list[str]:
+        cutoff = 0.6
+        result = []
+        s = difflib.SequenceMatcher()
+        s.set_seq2(word)
+        for x in words_list:
+            s.set_seq1(x)
+            if s.real_quick_ratio() >= cutoff and \
+            s.quick_ratio() >= cutoff and \
+            s.ratio() >= cutoff:
+                result.append((s.ratio(), x))
+        
+        
+        final_form = []
+        for word in sorted(result, key=lambda s: s[0], reverse=True)[0:12]:
+            if len(final_form) == 4: break
+            elif word[1] in final_form: continue
+            final_form.append(word[1])
+        return final_form
     
     def replace_in_text(self, replacement: str) -> None:
         self.text.string_text = self.text.string_text[:self.beginning] + (replacement.capitalize() if self.is_uppercase() else replacement.lower()) + self.text.string_text[self.ending:]

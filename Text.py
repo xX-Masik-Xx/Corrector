@@ -6,8 +6,9 @@ from pymorphy2 import MorphAnalyzer
 class Text:
     def __init__(self, string_text: str) -> None:
         self._string_text = string_text
-        self.dictionary = Dictionary("russian.txt")
+        #self.dictionary = Dictionary("russian.txt")
         self._morph_analyzer = MorphAnalyzer()
+        self.dictionary = self._morph_analyzer.dictionary.words
         self._contained_words = self.__split_words()
 
     def __split_words(self) -> list[Word]:
@@ -57,4 +58,3 @@ class Text:
     @string_text.setter
     def string_text(self, new_text) -> None:
         self._string_text = new_text
-        self.__split_words()

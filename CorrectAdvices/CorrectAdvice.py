@@ -18,6 +18,9 @@ class CorrectAdvice:
     def correct(self, answer = None) -> None:
         self._handler.mistakes_count -= 1
         self._handler.edited = True
+        
+    def correction_rejected(self) -> None:
+        self._handler.mistakes_count -= 1
 
     @staticmethod
     def check_for_presence(self, handler):

@@ -26,8 +26,23 @@ class SpellingCorrectionAdvice(CorrectAdvice):
 
     def correct(self, answer = None) -> None:
         super().correct(answer)
-        self.incorrect_word.replace_in_text(self.corrected_word[answer - 1])
-        self._handler.get_text.resplit_words()
+        
+        replacement = self.corrected_word[answer - 1]
+        
+        shift = len(replacement) - len(self.incorrect_word.as_string())
+        
+        for word in self._handler.get_text.contained_words:
+            if word == self.incorrect_word: continue
+            word.beginning += shift
+            word.ending += shift
+            
+        self.incorrect_word.replace_in_text(replacement)
+        self.incorrect_word.dictionary_word = replacement
+        
+    def correction_rejected(self) -> None:
+        super().correction_rejected()
+        delattr(self.incorrect_word, "_spelling_mistake")
+        self.incorrect_word.dictionary_word = self.incorrect_word.as_string()
 
     @property
     def incorrect_word(self) -> Word:
